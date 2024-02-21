@@ -6,46 +6,47 @@ const int PIN_PUL = 12;
 const int PIN_DIR = 6;
 const int PIN_ENA = A1;
 const int PIN_POT = A6;
-const int PIN_STATUS_MOTOR = 2;
-
-int HAL_SENSOR_STOP_VALUE = 530;
-const int HAL_SENSOR_FULL_THROTTLE_VALUE = 860;
+const int PIN_NEEDLE_OT = 8;
+const int PIN_NEEDLE_UT = 2;
 
 const int max_speed = 12000;
-const int acceleration = 20000;
-// const int deceleration = 20000;
+const int acceleration = 30000;
+const int HAL_SENSOR_FULL_THROTTLE_VALUE = 860;
+
+int HAL_SENSOR_STOP_VALUE = 530;
 
 int target_speed = 0;
 int last_target_speed = 0;
-boolean isPowerOff = true;
+boolean isPowerOff = false;
 
 ContinuousStepper<StepperDriver, ToneTicker> stepper;
+
+enum NeedlePosition {npOT, npUT, npInBetween};
+const char* NeedlePositionStr[] = {"OT", "UT", "in between"};
 
 void setupTimer1();
 void setupStepper();
 void setupStopValue();
 void MotorOff();
 void MotorOn();
+NeedlePosition getNeedlePosition();
 
 void setup() {
 
-  Serial.begin(9600);
 
   cli(); // disable interrupts during setup 
-
-  pinMode(PIN_STATUS_MOTOR, OUTPUT);
+  Serial.begin(9600);
 
   setupTimer1();
   setupStepper();
   setupStopValue();
-  MotorOff();
+  MotorOff();  
   sei(); // re-enable interrupts
 
 }
 
 void loop() {
   
-  // Serial.println(stepper.isSpinning());
   if ((target_speed == 0) and (!stepper.isSpinning())) {
     MotorOff();
   } else if ((target_speed > 0) and (!stepper.isSpinning())) {
@@ -53,30 +54,41 @@ void loop() {
   }
 
   if (last_target_speed != target_speed) {
-    Serial.println(target_speed);    
+    // Serial.println(target_speed);    
     last_target_speed = target_speed;
     stepper.spin(target_speed * -1);    
   }
+
+  Serial.println(NeedlePositionStr[getNeedlePosition()]);
 
   stepper.loop();
   
 }
 
+NeedlePosition getNeedlePosition() {
+  if (digitalRead(PIN_NEEDLE_OT) == HIGH) {
+    return npOT;
+  } else if (digitalRead(PIN_NEEDLE_UT) == HIGH) {
+    return npUT;
+  } else {
+    return npInBetween;
+  }
+}
+
+
 void MotorOff() {
   if (!isPowerOff) {
     stepper.powerOff();
-    digitalWrite(PIN_STATUS_MOTOR, LOW);
     isPowerOff = true;
-    Serial.println("Power off!");
+    // Serial.println("Power off!");
   }
 }
 
 void MotorOn() {
   if (isPowerOff) {
     stepper.powerOn();
-    digitalWrite(PIN_STATUS_MOTOR, HIGH);
     isPowerOff = false;
-    Serial.println("Power on!");
+    // Serial.println("Power on!");
   }
 }
 
@@ -107,6 +119,7 @@ void setupStepper() {
   stepper.begin(PIN_PUL, PIN_DIR);
   stepper.setAcceleration(acceleration);
   stepper.setEnablePin(PIN_ENA);
+  MotorOff();
 }
 
 // Timer 1 interrupt service routine (ISR)
