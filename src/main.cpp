@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <ContinuousStepper.h>
 #include <ContinuousStepper/Tickers/Tone.hpp>
+#include <setup.h>
 
 const int PIN_PUL = 12;
 const int PIN_DIR = 6;
@@ -24,7 +25,6 @@ ContinuousStepper<StepperDriver, ToneTicker> stepper;
 enum NeedlePosition {npOT, npUT, npInBetween};
 const char* NeedlePositionStr[] = {"OT", "UT", "in between"};
 
-void setupTimer1();
 void setupStepper();
 void setupStopValue();
 void MotorOff();
@@ -92,35 +92,6 @@ void MotorOn() {
   }
 }
 
-void setupStopValue() {  
-  int val = analogRead(PIN_POT);
-  HAL_SENSOR_STOP_VALUE = val + 10;
-}
-
-void setupTimer1() {
-  noInterrupts();
-  // Clear registers
-  TCCR1A = 0;
-  TCCR1B = 0;
-  TCNT1 = 0;
-
-  // 4 Hz (16000000/((15624+1)*256))
-  OCR1A = 15624;
-  // CTC
-  TCCR1B |= (1 << WGM12);
-  // Prescaler 256
-  TCCR1B |= (1 << CS12);
-  // Output Compare Match A Interrupt Enable
-  TIMSK1 |= (1 << OCIE1A);
-  interrupts();
-}
-
-void setupStepper() {
-  stepper.begin(PIN_PUL, PIN_DIR);
-  stepper.setAcceleration(acceleration);
-  stepper.setEnablePin(PIN_ENA);
-  MotorOff();
-}
 
 // Timer 1 interrupt service routine (ISR)
 // Wertet die Positon des Fußpedals aus
@@ -136,4 +107,16 @@ ISR(TIMER1_COMPA_vect)
     target_speed = map(val, HAL_SENSOR_FULL_THROTTLE_VALUE, HAL_SENSOR_STOP_VALUE, max_speed, 0);
   }
   
+}
+
+void setupStopValue() {  
+  int val = analogRead(PIN_POT);
+  HAL_SENSOR_STOP_VALUE = val + 10;
+}
+
+void setupStepper() {
+  stepper.begin(PIN_PUL, PIN_DIR);
+  stepper.setAcceleration(acceleration);
+  stepper.setEnablePin(PIN_ENA);
+  MotorOff();
 }
