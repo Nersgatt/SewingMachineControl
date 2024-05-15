@@ -1,18 +1,9 @@
 #include <Arduino.h>
 #include <ContinuousStepper.h>
 #include <ContinuousStepper/Tickers/Tone.hpp>
+
+#include <config.h>
 #include <setup.h>
-
-const int PIN_PUL = 12;
-const int PIN_DIR = 6;
-const int PIN_ENA = A1;
-const int PIN_POT = A6;
-const int PIN_NEEDLE_OT = 8;
-const int PIN_NEEDLE_UT = 2;
-
-const int max_speed = 12000;
-const int acceleration = 30000;
-const int HAL_SENSOR_FULL_THROTTLE_VALUE = 860;
 
 int HAL_SENSOR_STOP_VALUE = 530;
 
@@ -59,7 +50,7 @@ void loop() {
     stepper.spin(target_speed * -1);    
   }
 
-  Serial.println(NeedlePositionStr[getNeedlePosition()]);
+  //Serial.println(NeedlePositionStr[getNeedlePosition()]);
 
   stepper.loop();
   
