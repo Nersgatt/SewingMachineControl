@@ -1,1 +1,0 @@
-void setupTimer1();

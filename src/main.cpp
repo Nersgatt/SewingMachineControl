@@ -3,7 +3,6 @@
 #include <ContinuousStepper/Tickers/Tone.hpp>
 
 #include <config.h>
-#include <setup.h>
 
 int HAL_SENSOR_STOP_VALUE = 530;
 
@@ -13,14 +12,12 @@ boolean isPowerOff = false;
 
 ContinuousStepper<StepperDriver, ToneTicker> stepper;
 
-enum NeedlePosition {npOT, npUT, npInBetween};
-const char* NeedlePositionStr[] = {"OT", "UT", "in between"};
-
 void setupStepper();
 void setupStopValue();
+void setupTimer1() ;
+
 void MotorOff();
 void MotorOn();
-NeedlePosition getNeedlePosition();
 
 void setup() {
 
@@ -45,25 +42,13 @@ void loop() {
   }
 
   if (last_target_speed != target_speed) {
-    // Serial.println(target_speed);    
     last_target_speed = target_speed;
     stepper.spin(target_speed * -1);    
   }
 
-  //Serial.println(NeedlePositionStr[getNeedlePosition()]);
 
   stepper.loop();
   
-}
-
-NeedlePosition getNeedlePosition() {
-  if (digitalRead(PIN_NEEDLE_OT) == HIGH) {
-    return npOT;
-  } else if (digitalRead(PIN_NEEDLE_UT) == HIGH) {
-    return npUT;
-  } else {
-    return npInBetween;
-  }
 }
 
 
@@ -71,7 +56,6 @@ void MotorOff() {
   if (!isPowerOff) {
     stepper.powerOff();
     isPowerOff = true;
-    // Serial.println("Power off!");
   }
 }
 
@@ -79,7 +63,6 @@ void MotorOn() {
   if (isPowerOff) {
     stepper.powerOn();
     isPowerOff = false;
-    // Serial.println("Power on!");
   }
 }
 
@@ -110,4 +93,22 @@ void setupStepper() {
   stepper.setAcceleration(acceleration);
   stepper.setEnablePin(PIN_ENA);
   MotorOff();
+}
+
+void setupTimer1() {
+  noInterrupts();
+  // Clear registers
+  TCCR1A = 0;
+  TCCR1B = 0;
+  TCNT1 = 0;
+
+  // 4 Hz (16000000/((15624+1)*256))
+  OCR1A = 15624;
+  // CTC
+  TCCR1B |= (1 << WGM12);
+  // Prescaler 256
+  TCCR1B |= (1 << CS12);
+  // Output Compare Match A Interrupt Enable
+  TIMSK1 |= (1 << OCIE1A);
+  interrupts();
 }
