@@ -23,7 +23,7 @@ void setup() {
 
 
   cli(); // disable interrupts during setup 
-  Serial.begin(9600);
+  // Serial.begin(9600);
 
   setupTimer1();
   setupStepper();
