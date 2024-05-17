@@ -10,43 +10,84 @@ int target_speed = 0;
 int last_target_speed = 0;
 boolean isPowerOff = false;
 
+enum MachineStatus {STOP, STARTING, RUNNING, STOPPING};
+
+MachineStatus Status = STOP;
+const String StatusText[4] = {"STOP", "STARTING", "RUNNING", "STOPPING"};
+
 ContinuousStepper<StepperDriver, ToneTicker> stepper;
 
 void setupStepper();
 void setupStopValue();
 void setupTimer1() ;
 
+void STM_Main();
 void MotorOff();
 void MotorOn();
 
 void setup() {
 
+  #ifdef DEBUG_INFO
+  Serial.begin(9600);
+  #endif
 
-  cli(); // disable interrupts during setup 
-  // Serial.begin(9600);
-
-  setupTimer1();
   setupStepper();
   setupStopValue();
   MotorOff();  
-  sei(); // re-enable interrupts
+  setupTimer1();
+
+}
+
+void STM_Main() {
+
+  switch (Status)
+  {
+  case STOP:
+    if (target_speed > 0) {
+      Status = STARTING;
+    }
+    break;
+
+  case STARTING:
+    MotorOn();
+    Status = RUNNING;
+    break;
+
+  case RUNNING:    
+    if (last_target_speed != target_speed) {
+      last_target_speed = target_speed;
+      stepper.spin(target_speed * -1);    
+    }
+
+    if (target_speed == 0) {
+      Status = STOPPING;
+    }
+    break;
+
+  case STOPPING:
+    if (target_speed > 0) {
+      Status = RUNNING;
+    } else {
+      if (!stepper.isSpinning()) {
+        MotorOff();
+        Status = STOP;
+      }
+    }
+    break;
+
+  }
 
 }
 
 void loop() {
   
-  if ((target_speed == 0) and (!stepper.isSpinning())) {
-    MotorOff();
-  } else if ((target_speed > 0) and (!stepper.isSpinning())) {
-    MotorOn();
-  }
 
-  if (last_target_speed != target_speed) {
-    last_target_speed = target_speed;
-    stepper.spin(target_speed * -1);    
-  }
+  #ifdef DEBUG_INFO
+    Serial.print("Status ");
+    Serial.println(StatusText[Status]);
+  #endif
 
-
+  STM_Main();
   stepper.loop();
   
 }
@@ -102,13 +143,13 @@ void setupTimer1() {
   TCCR1B = 0;
   TCNT1 = 0;
 
-  // 4 Hz (16000000/((15624+1)*256))
-  OCR1A = 15624;
+  // 10 Hz (16000000/((6249+1)*256))
+  OCR1A = 6249;
   // CTC
   TCCR1B |= (1 << WGM12);
   // Prescaler 256
   TCCR1B |= (1 << CS12);
   // Output Compare Match A Interrupt Enable
   TIMSK1 |= (1 << OCIE1A);
-  interrupts();
+  interrupts();  
 }

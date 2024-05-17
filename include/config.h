@@ -8,3 +8,5 @@ const int PIN_POT = A6; // Analoger Ausgang des KY-024
 const int max_speed = 12000;                    // Höchstgeschwindigkeit
 const int acceleration = 30000;                 // Beschleunigung
 const int HAL_SENSOR_FULL_THROTTLE_VALUE = 860; // Vollgas-Wert des HAL-Sensors
+
+// #define DEBUG_INFO  // Achtung: Wenn DEBUG-Infos ausgegeben werden, läuft die Maschine deutlich langsamer, da stepper.loop (zeitlich gesehen) seltener aufgerufen wird
