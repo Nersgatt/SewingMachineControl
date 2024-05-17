@@ -24,3 +24,11 @@ Anmerkungen:
 - Wenn der Motor nicht anläuft, einfach mal den Magneten umdrehen. Der Wert, den der HAL-Sensor ausgibt,
   hängt von der Polung des Magneten ab.
 - Der Quellcode verwendet die Bibliothek Continous Stepper: https://github.com/bblanchon/ArduinoContinuousStepper
+
+Änderung an ArduinoContinuousStepper
+====================================
+In ContinousStepperImpl.hpp habe ich folgende function eingefügt (nach isSpinning):
+
+  bool isPowerOn() const {
+    return status_ != OFF;
+  }
