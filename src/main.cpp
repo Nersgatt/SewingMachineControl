@@ -11,9 +11,12 @@ int last_target_speed = 0;
 boolean isPowerOff = false;
 
 enum MachineStatus {STOP, STARTING, RUNNING, STOPPING};
-
-MachineStatus Status = STOP;
 const String StatusText[4] = {"STOP", "STARTING", "RUNNING", "STOPPING"};
+MachineStatus Status = STOP;
+
+enum NeedleStatus {UNKNOWN_Triggered, UNKNOWN_Hold, OT_Triggered, OT_Hold, UT_Triggered, UT_Hold};
+const String NeedleStatusText[6] = {"UNKNOWN triggered", "Unknown hold", "OT triggered", "OT hold", "UT triggered", "UT hold"};
+NeedleStatus StatusNeedle = UNKNOWN_Hold;
 
 ContinuousStepper<StepperDriver, ToneTicker> stepper;
 
@@ -22,6 +25,7 @@ void setupStopValue();
 void setupTimer1() ;
 
 void STM_Main();
+void STM_NeedleStatus();
 void MotorOff();
 void MotorOn();
 
@@ -31,6 +35,9 @@ void setup() {
   Serial.begin(9600);
   #endif
 
+  pinMode(PIN_UT, INPUT);
+  pinMode(PIN_OT, INPUT);
+  
   setupStepper();
   setupStopValue();
   MotorOff();  
@@ -79,14 +86,89 @@ void STM_Main() {
 
 }
 
+void STM_NeedleStatus() {
+  static NeedleStatus LastStatusNeedle = UNKNOWN_Hold;
+
+  bool SensorOT = (digitalRead(PIN_OT) == LOW);
+  bool SensorUT = (digitalRead(PIN_UT) == LOW);
+
+  switch (StatusNeedle) {
+    case UNKNOWN_Triggered:
+      
+      if (SensorOT) {
+        StatusNeedle = OT_Triggered;
+      } else if (SensorUT) {
+        StatusNeedle = UT_Triggered;
+      } else {
+        StatusNeedle = UNKNOWN_Hold;
+      }
+
+      break;
+    case UNKNOWN_Hold:
+
+      if (SensorOT) {
+        StatusNeedle = OT_Triggered;
+      } else if (SensorUT) {
+        StatusNeedle = UT_Triggered;
+      }
+
+      break;
+    case OT_Triggered:
+
+      if (SensorOT) {
+        StatusNeedle = OT_Hold;
+      } else if (SensorUT) {
+        StatusNeedle = UT_Triggered;
+      } else {
+        StatusNeedle = UNKNOWN_Triggered;
+      }
+
+      break;
+    case OT_Hold:
+      
+      if (SensorUT) {
+        StatusNeedle = UT_Triggered;
+      } else if (!SensorOT) {
+        StatusNeedle = UNKNOWN_Triggered;
+      }
+
+      break;
+    case UT_Triggered:
+
+      if (SensorUT) {
+        StatusNeedle = UT_Hold;
+      } else if (SensorOT) {
+        StatusNeedle = OT_Triggered;
+      } else {
+        StatusNeedle = UNKNOWN_Triggered;
+      }
+      break;
+    case UT_Hold:
+      if (SensorOT) {
+        StatusNeedle = OT_Triggered;
+      } else if (!SensorUT) {
+        StatusNeedle = UNKNOWN_Triggered;
+      }
+      break;
+  }
+
+}
+
 void loop() {
-  
+  static NeedleStatus LastStatusNeedle = UNKNOWN_Hold;
+
+  STM_NeedleStatus();
 
   #ifdef DEBUG_INFO
-    Serial.print("Status ");
-    Serial.println(StatusText[Status]);
-  #endif
+    // Serial.print("Status ");
+    // Serial.println(StatusText[Status]);
 
+    if (LastStatusNeedle != StatusNeedle) {
+      Serial.println(NeedleStatusText[StatusNeedle]);
+      LastStatusNeedle = StatusNeedle;
+    }
+  #endif
+  
   STM_Main();
   stepper.loop();
   
