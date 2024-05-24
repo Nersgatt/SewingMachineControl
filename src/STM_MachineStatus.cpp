@@ -49,15 +49,13 @@ void STM_MachineStatus() {
 }
 
 void MotorOff() {
-  if (!isPowerOff) {
+  if (stepper.isPowerOn()) {
     stepper.powerOff();
-    isPowerOff = true;
   }
 }
 
 void MotorOn() {
-  if (isPowerOff) {
+  if (!stepper.isPowerOn()) {
     stepper.powerOn();
-    isPowerOff = false;
   }
 }

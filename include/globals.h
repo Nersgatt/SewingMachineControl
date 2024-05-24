@@ -4,7 +4,6 @@
 
 extern ContinuousStepper<StepperDriver, ToneTicker> stepper;
 extern int target_speed;
-extern boolean isPowerOff;
 
 extern int HAL_SENSOR_STOP_VALUE;
 
