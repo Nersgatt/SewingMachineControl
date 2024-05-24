@@ -3,6 +3,7 @@
 #include <ContinuousStepper/Tickers/Tone.hpp>
 
 #include <config.h>
+#include <globals.h>
 
 int HAL_SENSOR_STOP_VALUE = 530;
 
@@ -26,6 +27,7 @@ void setupTimer1() ;
 
 void STM_Main();
 void STM_NeedleStatus();
+
 void MotorOff();
 void MotorOn();
 
@@ -87,8 +89,6 @@ void STM_Main() {
 }
 
 void STM_NeedleStatus() {
-  static NeedleStatus LastStatusNeedle = UNKNOWN_Hold;
-
   bool SensorOT = (digitalRead(PIN_OT) == LOW);
   bool SensorUT = (digitalRead(PIN_UT) == LOW);
 
@@ -155,18 +155,31 @@ void STM_NeedleStatus() {
 }
 
 void loop() {
-  static NeedleStatus LastStatusNeedle = UNKNOWN_Hold;
+  // static NeedleStatus LastStatusNeedle = UNKNOWN_Hold;
+  unsigned long CurrentMillis = millis();
+  static unsigned long LastUTMillis = CurrentMillis;
+  float SecsPerStitch;
 
   STM_NeedleStatus();
+
+  if (StatusNeedle == UT_Triggered) {
+    SecsPerStitch = float(CurrentMillis - LastUTMillis) / 1000;
+    LastUTMillis = CurrentMillis;
+
+    #ifdef DEBUG_INFO
+      Serial.print("Stitches/Sec: ");
+      Serial.println(1/SecsPerStitch);
+    #endif
+  }
 
   #ifdef DEBUG_INFO
     // Serial.print("Status ");
     // Serial.println(StatusText[Status]);
 
-    if (LastStatusNeedle != StatusNeedle) {
-      Serial.println(NeedleStatusText[StatusNeedle]);
-      LastStatusNeedle = StatusNeedle;
-    }
+    // if (LastStatusNeedle != StatusNeedle) {
+    //   Serial.println(NeedleStatusText[StatusNeedle]);
+    //   LastStatusNeedle = StatusNeedle;
+    // }
   #endif
   
   STM_Main();
