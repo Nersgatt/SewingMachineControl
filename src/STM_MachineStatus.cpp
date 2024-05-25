@@ -1,9 +1,12 @@
 #include <Arduino.h>
 #include <globals.h>
 #include <STM_MachineStatus.h>
+#include <STM_NeedleStatus.h>
+#include <config.h>
 
 const String MachineStatusText[4] = {"STOP", "STARTING", "RUNNING", "STOPPING"};
 MachineStatus StatusMachine = STOP;
+NeedleStopPositions NeedleStopPostion = DOWN;
 
 void STM_MachineStatus() {
 
@@ -37,13 +40,21 @@ void STM_MachineStatus() {
     if (target_speed > 0) {
       StatusMachine = RUNNING;
     } else {
-      if (!stepper.isSpinning()) {
-        MotorOff();
-        StatusMachine = STOP;
+      if ((stepper.speed() * -1) <= POSITIONING_SPEED) {
+
+        if (((NeedleStopPostion == DOWN) && !IsNeedleDown()) ||
+            ((NeedleStopPostion == UP) && !IsNeedleUp())) {
+          // Geschwindigkeit halten, bis gewünschte Position gerreicht ist
+          stepper.spin(POSITIONING_SPEED * -1); 
+        } else {
+          // Endposition erreicht
+          stepper.spin(0);
+          MotorOff();
+          StatusMachine = STOP;
+        }
       }
     }
     break;
-
   }
 
 }

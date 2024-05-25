@@ -6,6 +6,10 @@ void setupPins()
 {
   pinMode(PIN_UT, INPUT);
   pinMode(PIN_OT, INPUT);
+
+  pinMode(PIN_NEEDLE_UP, INPUT_PULLUP);
+  pinMode(PIN_NEEDLE_DOWN, INPUT_PULLUP);
+  pinMode(PIN_TOOGLE_POSITION, INPUT_PULLUP);
 }
 
 void setupStopValue() {  
@@ -35,4 +39,9 @@ void setupTimer1() {
   // Output Compare Match A Interrupt Enable
   TIMSK1 |= (1 << OCIE1A);
   interrupts();  
+}
+
+void setupLCD() {
+  lcd.init();
+  lcd.backlight();
 }

@@ -70,3 +70,11 @@ void STM_NeedleStatus() {
   }
 
 }
+
+bool IsNeedleUp() {
+  return StatusNeedle == OT_Triggered || StatusNeedle == OT_Hold;
+};
+
+bool IsNeedleDown() {
+  return StatusNeedle == UT_Triggered || StatusNeedle == UT_Hold;
+};

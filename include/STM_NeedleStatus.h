@@ -6,3 +6,5 @@ extern const String NeedleStatusText[6];
 extern NeedleStatus StatusNeedle;
 
 void STM_NeedleStatus();
+bool IsNeedleUp();
+bool IsNeedleDown();

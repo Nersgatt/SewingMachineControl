@@ -2,6 +2,9 @@
 #include <ContinuousStepper.h>
 #include <ContinuousStepper/Tickers/Tone.hpp>
 
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+
 #include <config.h>
 #include <globals.h>
 #include <setup.h>
@@ -20,28 +23,30 @@ void setup() {
   setupStopValue();
   MotorOff();  
   setupTimer1();
+  setupLCD();
+
+  lcd.print("Pfaff 130");
 }
 
 
 void loop() {
-  // static NeedleStatus LastStatusNeedle = UNKNOWN_Hold;
-  unsigned long CurrentMillis = millis();
-  static unsigned long LastUTMillis = CurrentMillis;
-  float SecsPerStitch;
+  // unsigned long CurrentMillis = millis();
+  // static unsigned long LastUTMillis = CurrentMillis;
+  // float SecsPerStitch;
 
   STM_NeedleStatus();
   STM_MachineStatus();
   stepper.loop();
 
-  if (StatusNeedle == UT_Triggered) {
-    SecsPerStitch = float(CurrentMillis - LastUTMillis) / 1000;
-    LastUTMillis = CurrentMillis;
+  // if (StatusNeedle == UT_Triggered) {
+  //   SecsPerStitch = float(CurrentMillis - LastUTMillis) / 1000;
+  //   LastUTMillis = CurrentMillis;
 
-    #ifdef DEBUG_INFO
-      Serial.print("Stitches/Sec: ");
-      Serial.println(1/SecsPerStitch);
-    #endif
-  }
+    // #ifdef DEBUG_INFO
+    //   Serial.print("Stitches/Sec: ");
+    //   Serial.println(1/SecsPerStitch);
+    // #endif
+  // }
 
   #ifdef DEBUG_INFO
     // Serial.print("Status ");
@@ -51,6 +56,18 @@ void loop() {
     //   Serial.println(NeedleStatusText[StatusNeedle]);
     //   LastStatusNeedle = StatusNeedle;
     // }
+    if (digitalRead(PIN_NEEDLE_UP) == LOW) {
+      Serial.println("Needle up");
+    }
+
+    if (digitalRead(PIN_NEEDLE_DOWN) == LOW) {
+      Serial.println("Needle down");
+    }
+
+    if (digitalRead(PIN_TOOGLE_POSITION) == LOW) {
+      Serial.println("Toogle");
+    }
+
   #endif  
 }
 
