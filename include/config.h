@@ -6,8 +6,8 @@
 #define PIN_POT A6              // Analoger Ausgang des KY-024
 #define PIN_UT 2                // PIN für UT-Sensor
 #define PIN_OT 8                // PIN für OT-Sensor
-#define PIN_NEEDLE_UP 3         // PIN um die Nadel hoch zu stellen (Taster)
-#define PIN_NEEDLE_DOWN 4       // PIN um die Nadel runter zu stellen (Taster)
+#define PIN_MOVE_NEEDLE 3         // PIN um die Nadel hoch zu stellen (Taster)
+// #define PIN_NEEDLE_DOWN 4       // PIN um die Nadel runter zu stellen (Taster)
 #define PIN_TOOGLE_POSITION 5   // PIN um die gewünschte Stop-Position der Nadel einzustellen (Taster)
 
 #define MAX_SPEED 12000                    // Höchstgeschwindigkeit
@@ -20,4 +20,4 @@
 #define HOLD_DELAY 1000 // DELAY, nach dem der Button in den Status "HOLD" geht, um einen langen Buttonpress zu erkennen
 
 
-//#define DEBUG_INFO  // Achtung: Wenn DEBUG-Infos ausgegeben werden, läuft die Maschine deutlich langsamer, da stepper.loop (zeitlich gesehen) seltener aufgerufen wird
+#define DEBUG_INFO  // Achtung: Wenn DEBUG-Infos ausgegeben werden, läuft die Maschine deutlich langsamer, da stepper.loop (zeitlich gesehen) seltener aufgerufen wird

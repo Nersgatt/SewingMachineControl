@@ -8,6 +8,7 @@ const String MachineStatusText[] = {"STOP", "STARTING", "RUNNING", "STOPPING"};
 const String NeedleStopPositionsText[] = {"Oben", "Unten", "Egal"};
 MachineStatus StatusMachine = STOP;
 NeedleStopPositions NeedleStopPostion = DontCare;
+PositioningStatus StatusPositioning = psPOSITIONING_STOPPED;
 
 void STM_MachineStatus() {
 
@@ -62,7 +63,7 @@ void STM_MachineStatus() {
         MotorOff();
         StatusMachine = STOP;
         ErrorText = "Positionierung?!";
-        status = ENTER_ERROR;
+        status = msENTER_ERROR;
       } else {
 
         if (((NeedleStopPostion == DOWN) && !IsNeedleDown()) ||
@@ -80,6 +81,55 @@ void STM_MachineStatus() {
     break;
   }
 
+}
+
+void STM_Positioning() {
+
+  static NeedleStatus TargetStatus = OT_Triggered;
+  static long t_PosStart = 0;
+
+  switch (StatusPositioning)
+  {
+  case psPOSITIONING_STOPPED:
+    break;
+  case psPOSITIONING_START:
+    t_PosStart = CurrentMillis;
+    if (LastNeedlePostion == npOT) {
+      TargetStatus = UT_Triggered;
+    } else {
+      TargetStatus = OT_Triggered;
+    }
+
+    stepper.spin(POSITIONING_SPEED * -1);
+    MotorOn();
+    StatusPositioning = psPOSITIONING_RUNNING;
+    break;
+
+  case psPOSITIONING_RUNNING:
+    if (CurrentMillis - t_PosStart > MAX_POSITIONING_DELAY) {
+      // Die Positionierung dauert zu lange. In den Fehlerzustand gehen
+      stepper.spin(0);
+      MotorOff();
+      StatusPositioning = psPOSITIONING_STOPPED;
+      ErrorText = "Positionierung?!";
+      status = msENTER_ERROR;
+    } else {
+
+      if (StatusNeedle == TargetStatus) {
+        stepper.spin(0); 
+        MotorOff();
+        StatusPositioning = psPOSITIONING_DONE;
+      }
+    }
+    break;
+  case psPOSITIONING_DONE:
+    StatusPositioning = psPOSITIONING_STOPPED;
+    break;  
+  }
+}
+
+void StartPositioning() {
+  StatusPositioning = psPOSITIONING_START;
 }
 
 void MotorOff() {

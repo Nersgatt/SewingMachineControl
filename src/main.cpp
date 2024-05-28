@@ -39,7 +39,7 @@ void loop() {
   CurrentMillis = millis();
 
   switch (status) {
-    case READY:
+    case msSEWING:
       STM_NeedleStatus();
       STM_MachineStatus();
 
@@ -48,10 +48,15 @@ void loop() {
       } else {
         // Maschine reagiert nur auf Buttons, wenn der Fußanlasser nicht betätigt wird
         STM_BTN_NeedlePosition();
+        STM_BTN_MoveNeedle();
 
         if (Status_BTN_NeedlePosition == TRIGGERED) {
           ToogleNeedleStopPosition();
           UpdateDisplayNeedlePosition();
+        }
+
+        if (Status_BTN_MoveNeedle == TRIGGERED) {
+          status = msPOSITIONING;
         }
       }
 
@@ -61,17 +66,26 @@ void loop() {
         UpdateDisplayStichCount(StichCnt);
       }
       break;
-    case ENTER_ERROR:
-      UpdateDisplayError();      
-      status = ERROR;
+    case msPOSITIONING:      
+      if (StatusPositioning == psPOSITIONING_STOPPED) {
+        StartPositioning();
+      }
+      STM_NeedleStatus();
+      STM_Positioning();
+      if (StatusPositioning == psPOSITIONING_DONE) {
+        status = msSEWING;
+      }
+      stepper.loop();
       break;
-    case ERROR:
+    case msENTER_ERROR:
+      UpdateDisplayError();      
+      status = msERROR;
+      break;
+    case msERROR:
       break;
   }
 
 }
-
-
 
 // Timer 1 interrupt service routine (ISR)
 // Wertet die Positon des Fußpedals aus

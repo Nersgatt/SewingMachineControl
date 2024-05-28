@@ -12,6 +12,6 @@ extern int HAL_SENSOR_STOP_VALUE;
 extern LiquidCrystal_I2C lcd;
 extern unsigned long CurrentMillis;
 
-enum MainStatus {READY, ENTER_ERROR, ERROR};
+enum MainStatus {msSEWING, msPOSITIONING, msENTER_ERROR, msERROR};
 extern MainStatus status;
 extern String ErrorText;

@@ -4,6 +4,7 @@
 
 const String NeedleStatusText[6] = {"UNKNOWN triggered", "Unknown hold", "OT triggered", "OT hold", "UT triggered", "UT hold"};
 NeedleStatus StatusNeedle = UNKNOWN_Hold;
+NeedlePosition LastNeedlePostion = npOT;
 
 void STM_NeedleStatus() {
   bool SensorOT = (digitalRead(PIN_OT) == LOW);
@@ -31,7 +32,7 @@ void STM_NeedleStatus() {
 
       break;
     case OT_Triggered:
-
+      LastNeedlePostion = npOT;
       if (SensorOT) {
         StatusNeedle = OT_Hold;
       } else if (SensorUT) {
@@ -51,7 +52,7 @@ void STM_NeedleStatus() {
 
       break;
     case UT_Triggered:
-
+      LastNeedlePostion = npUT;
       if (SensorUT) {
         StatusNeedle = UT_Hold;
       } else if (SensorOT) {

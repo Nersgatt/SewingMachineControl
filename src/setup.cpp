@@ -8,8 +8,8 @@ void setupPins()
   pinMode(PIN_UT, INPUT);
   pinMode(PIN_OT, INPUT);
 
-  pinMode(PIN_NEEDLE_UP, INPUT_PULLUP);
-  pinMode(PIN_NEEDLE_DOWN, INPUT_PULLUP);
+  pinMode(PIN_MOVE_NEEDLE, INPUT_PULLUP);
+  // pinMode(PIN_NEEDLE_DOWN, INPUT_PULLUP);
   pinMode(PIN_TOOGLE_POSITION, INPUT_PULLUP);
 }
 
