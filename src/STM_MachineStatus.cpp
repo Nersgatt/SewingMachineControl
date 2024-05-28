@@ -9,6 +9,7 @@ const String NeedleStopPositionsText[] = {"Oben", "Unten", "Egal"};
 MachineStatus StatusMachine = STOP;
 NeedleStopPositions NeedleStopPostion = DontCare;
 PositioningStatus StatusPositioning = psPOSITIONING_STOPPED;
+PositioningStatus StatusOneStitch = psPOSITIONING_STOPPED;
 
 void STM_MachineStatus() {
 
@@ -128,8 +129,51 @@ void STM_Positioning() {
   }
 }
 
+void STM_OneSitch() {
+
+  static long t_PosStart = 0;
+
+  switch (StatusOneStitch)
+  {
+  case psPOSITIONING_STOPPED:
+    break;
+  case psPOSITIONING_START:
+    t_PosStart = CurrentMillis;
+
+    stepper.spin(POSITIONING_SPEED * -1);
+    MotorOn();
+    StatusOneStitch = psPOSITIONING_RUNNING;
+    break;
+
+  case psPOSITIONING_RUNNING:
+    if (CurrentMillis - t_PosStart > (MAX_POSITIONING_DELAY * 2)) {
+      // Die Positionierung dauert zu lange. In den Fehlerzustand gehen
+      stepper.spin(0);
+      MotorOff();
+      StatusOneStitch = psPOSITIONING_STOPPED;
+      ErrorText = "Positionierung?!";
+      status = msENTER_ERROR;
+    } else {
+
+      if (StatusNeedle == UT_Triggered) {
+        stepper.spin(0); 
+        MotorOff();
+        StatusOneStitch = psPOSITIONING_DONE;
+      }
+    }
+    break;
+  case psPOSITIONING_DONE:
+    StatusOneStitch = psPOSITIONING_STOPPED;
+    break;  
+  }
+}
+
 void StartPositioning() {
   StatusPositioning = psPOSITIONING_START;
+}
+
+void StartOneStitch() {
+  StatusOneStitch = psPOSITIONING_START;
 }
 
 void MotorOff() {

@@ -6,8 +6,8 @@
 #define PIN_POT A6              // Analoger Ausgang des KY-024
 #define PIN_UT 2                // PIN für UT-Sensor
 #define PIN_OT 8                // PIN für OT-Sensor
-#define PIN_MOVE_NEEDLE 3         // PIN um die Nadel hoch zu stellen (Taster)
-// #define PIN_NEEDLE_DOWN 4       // PIN um die Nadel runter zu stellen (Taster)
+#define PIN_MOVE_NEEDLE 3       // PIN um die Nadel hoch oder runter zu stellen (Taster)
+#define PIN_ONE_STITCH 4        // PIN um einen Stich zu nähen (Taster)
 #define PIN_TOOGLE_POSITION 5   // PIN um die gewünschte Stop-Position der Nadel einzustellen (Taster)
 
 #define MAX_SPEED 12000                    // Höchstgeschwindigkeit

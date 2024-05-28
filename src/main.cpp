@@ -49,6 +49,7 @@ void loop() {
         // Maschine reagiert nur auf Buttons, wenn der Fußanlasser nicht betätigt wird
         STM_BTN_NeedlePosition();
         STM_BTN_MoveNeedle();
+        STM_BTN_OneStitch();
 
         if (Status_BTN_NeedlePosition == TRIGGERED) {
           ToogleNeedleStopPosition();
@@ -57,6 +58,10 @@ void loop() {
 
         if (Status_BTN_MoveNeedle == TRIGGERED) {
           status = msPOSITIONING;
+        }
+
+        if (Status_BTN_OneStitch == TRIGGERED) {
+          status = msOneStitch;
         }
       }
 
@@ -73,6 +78,19 @@ void loop() {
       STM_NeedleStatus();
       STM_Positioning();
       if (StatusPositioning == psPOSITIONING_DONE) {
+        status = msSEWING;
+      }
+      stepper.loop();
+      break;
+    case msOneStitch:      
+      if (StatusOneStitch == psPOSITIONING_STOPPED) {
+        StartOneStitch();
+      }
+      // Serial.print("LastNeedlePos "); Serial.print(LastNeedlePostion); Serial.println("");
+      STM_NeedleStatus();
+
+      STM_OneSitch();
+      if (StatusOneStitch == psPOSITIONING_DONE) {
         status = msSEWING;
       }
       stepper.loop();

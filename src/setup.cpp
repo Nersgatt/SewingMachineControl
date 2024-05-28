@@ -9,7 +9,7 @@ void setupPins()
   pinMode(PIN_OT, INPUT);
 
   pinMode(PIN_MOVE_NEEDLE, INPUT_PULLUP);
-  // pinMode(PIN_NEEDLE_DOWN, INPUT_PULLUP);
+  pinMode(PIN_ONE_STITCH, INPUT_PULLUP);
   pinMode(PIN_TOOGLE_POSITION, INPUT_PULLUP);
 }
 

@@ -9,10 +9,16 @@ extern const String NeedleStopPositionsText[];
 extern MachineStatus StatusMachine;
 extern NeedleStopPositions NeedleStopPostion;
 extern PositioningStatus StatusPositioning;
+extern PositioningStatus StatusOneStitch;
+
 
 void STM_MachineStatus();
 void MotorOff();
 void MotorOn();
 void ToogleNeedleStopPosition();
+
 void STM_Positioning();
 void StartPositioning();
+
+void STM_OneSitch();
+void StartOneStitch();
