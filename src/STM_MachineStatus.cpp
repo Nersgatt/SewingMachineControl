@@ -5,8 +5,9 @@
 #include <config.h>
 
 const String MachineStatusText[4] = {"STOP", "STARTING", "RUNNING", "STOPPING"};
+const String NeedleStopPositionsText[3] = {"Oben", "Unten", "Egal"};
 MachineStatus StatusMachine = STOP;
-NeedleStopPositions NeedleStopPostion = DOWN;
+NeedleStopPositions NeedleStopPostion = DontCare;
 
 void STM_MachineStatus() {
 
@@ -68,5 +69,19 @@ void MotorOff() {
 void MotorOn() {
   if (!stepper.isPowered()) {
     stepper.powerOn();
+  }
+}
+
+void ToogleNeedleStopPosition() {
+  switch (NeedleStopPostion) {
+    case UP:
+      NeedleStopPostion = DOWN;
+      break;
+    case DOWN:
+      NeedleStopPostion = DontCare;
+      break;
+    case DontCare:
+      NeedleStopPostion = UP;
+      break;
   }
 }

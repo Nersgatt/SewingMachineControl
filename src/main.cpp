@@ -10,7 +10,8 @@
 #include <setup.h>
 #include <STM_NeedleStatus.h>
 #include <STM_MachineStatus.h>
-
+#include <STM_Buttons.h>
+#include <display.h>
 
 void setup() {
 
@@ -26,49 +27,37 @@ void setup() {
   setupLCD();
 
   lcd.print("Pfaff 130");
+  UpdateDisplay();
 }
 
 
 void loop() {
-  // unsigned long CurrentMillis = millis();
-  // static unsigned long LastUTMillis = CurrentMillis;
-  // float SecsPerStitch;
+
+  // static int lastStatus = 0;
+
+  CurrentMillis = millis();
 
   STM_NeedleStatus();
   STM_MachineStatus();
-  stepper.loop();
+  if (StatusMachine != STOP) {
+    stepper.loop();
+  } else {
+    STM_BTN_NeedlePosition();
 
-  // if (StatusNeedle == UT_Triggered) {
-  //   SecsPerStitch = float(CurrentMillis - LastUTMillis) / 1000;
-  //   LastUTMillis = CurrentMillis;
-
-    // #ifdef DEBUG_INFO
-    //   Serial.print("Stitches/Sec: ");
-    //   Serial.println(1/SecsPerStitch);
-    // #endif
-  // }
-
-  #ifdef DEBUG_INFO
-    // Serial.print("Status ");
-    // Serial.println(StatusText[Status]);
-
-    // if (LastStatusNeedle != StatusNeedle) {
-    //   Serial.println(NeedleStatusText[StatusNeedle]);
-    //   LastStatusNeedle = StatusNeedle;
+    #ifdef DEBUG_INFO
+    // if (state_s1 != lastStatus) {
+    //   lastStatus = state_s1;      
+    //   Serial.println(ButtonStatusText[state_s1]);      
     // }
-    if (digitalRead(PIN_NEEDLE_UP) == LOW) {
-      Serial.println("Needle up");
-    }
+    #endif  
 
-    if (digitalRead(PIN_NEEDLE_DOWN) == LOW) {
-      Serial.println("Needle down");
+    if (Status_BTN_NeedlePosition == TRIGGERED) {
+      ToogleNeedleStopPosition();
+      UpdateDisplay();
     }
+  }
 
-    if (digitalRead(PIN_TOOGLE_POSITION) == LOW) {
-      Serial.println("Toogle");
-    }
 
-  #endif  
 }
 
 

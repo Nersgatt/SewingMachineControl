@@ -10,3 +10,4 @@ extern int target_speed;
 extern int HAL_SENSOR_STOP_VALUE;
 
 extern LiquidCrystal_I2C lcd;
+extern unsigned long CurrentMillis;

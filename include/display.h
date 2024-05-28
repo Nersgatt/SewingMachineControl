@@ -1,0 +1,2 @@
+void UpdateDisplay();
+void CreateCustonCharacters();

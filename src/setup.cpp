@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <config.h>
 #include <globals.h>
+#include <display.h>
 
 void setupPins()
 {
@@ -44,4 +45,5 @@ void setupTimer1() {
 void setupLCD() {
   lcd.init();
   lcd.backlight();
+  CreateCustonCharacters();
 }
