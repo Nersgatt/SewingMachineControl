@@ -41,10 +41,8 @@ void CreateCustonCharacters() {
  lcd.createChar(2, customCharDontCare);    
 }
 
-void UpdateDisplay() {
-    lcd.clear();
-    lcd.setCursor(0, 1);
-    lcd.print("Nadel: ");
+void UpdateDisplayNeedlePosition() {
+    lcd.setCursor(7, 1);
     switch (NeedleStopPostion)
     {
     case UP:
@@ -57,4 +55,28 @@ void UpdateDisplay() {
         lcd.write(2);
         break;
     }
+}
+
+void UpdateDisplayStichCount(unsigned int StichCount) {
+  lcd.setCursor(8,0);
+  lcd.print(StichCount);
+}
+
+void UpdateDisplayError() {
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("!! FEHLER !!");
+  lcd.setCursor(0, 1);
+  lcd.print(ErrorText);
+  
+}
+
+void SetupDisplay() {
+    lcd.clear();
+    CreateCustonCharacters();
+
+    lcd.setCursor(0, 0);
+    lcd.print("Stiche: ");
+    lcd.setCursor(0, 1);
+    lcd.print("Nadel: ");   
 }

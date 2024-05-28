@@ -45,5 +45,5 @@ void setupTimer1() {
 void setupLCD() {
   lcd.init();
   lcd.backlight();
-  CreateCustonCharacters();
+  SetupDisplay();
 }

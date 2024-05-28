@@ -4,14 +4,15 @@
 #include <STM_NeedleStatus.h>
 #include <config.h>
 
-const String MachineStatusText[4] = {"STOP", "STARTING", "RUNNING", "STOPPING"};
-const String NeedleStopPositionsText[3] = {"Oben", "Unten", "Egal"};
+const String MachineStatusText[] = {"STOP", "STARTING", "RUNNING", "STOPPING"};
+const String NeedleStopPositionsText[] = {"Oben", "Unten", "Egal"};
 MachineStatus StatusMachine = STOP;
 NeedleStopPositions NeedleStopPostion = DontCare;
 
 void STM_MachineStatus() {
 
   static int last_target_speed = 0;
+  static long t_PosStart = 0;
 
   switch (StatusMachine)
   {
@@ -42,6 +43,27 @@ void STM_MachineStatus() {
       StatusMachine = RUNNING;
     } else {
       if ((stepper.speed() * -1) <= POSITIONING_SPEED) {
+        StatusMachine = STARTPOSITIONING;
+      }
+    }    
+    break;
+  case STARTPOSITIONING:
+    t_PosStart = CurrentMillis;
+    StatusMachine = POSITIONING;
+    break;
+  case POSITIONING:
+    if (target_speed > 0) {
+      StatusMachine = RUNNING;
+    } else {
+
+      if (CurrentMillis - t_PosStart > MAX_POSITIONING_DELAY) {
+        // Die Positionierung dauert zu lange. In den Fehlerzustand gehen
+        stepper.spin(0);
+        MotorOff();
+        StatusMachine = STOP;
+        ErrorText = "Positionierung?!";
+        status = ENTER_ERROR;
+      } else {
 
         if (((NeedleStopPostion == DOWN) && !IsNeedleDown()) ||
             ((NeedleStopPostion == UP) && !IsNeedleUp())) {

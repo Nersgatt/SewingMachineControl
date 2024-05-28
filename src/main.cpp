@@ -26,37 +26,48 @@ void setup() {
   setupTimer1();
   setupLCD();
 
-  lcd.print("Pfaff 130");
-  UpdateDisplay();
+  UpdateDisplayStichCount(0);
+  UpdateDisplayNeedlePosition();
 }
 
 
 void loop() {
 
   // static int lastStatus = 0;
+  static unsigned long StichCnt = 0;
 
   CurrentMillis = millis();
 
-  STM_NeedleStatus();
-  STM_MachineStatus();
-  if (StatusMachine != STOP) {
-    stepper.loop();
-  } else {
-    STM_BTN_NeedlePosition();
+  switch (status) {
+    case READY:
+      STM_NeedleStatus();
+      STM_MachineStatus();
 
-    #ifdef DEBUG_INFO
-    // if (state_s1 != lastStatus) {
-    //   lastStatus = state_s1;      
-    //   Serial.println(ButtonStatusText[state_s1]);      
-    // }
-    #endif  
+      if (StatusMachine != STOP) {
+        stepper.loop();
+      } else {
+        // Maschine reagiert nur auf Buttons, wenn der Fußanlasser nicht betätigt wird
+        STM_BTN_NeedlePosition();
 
-    if (Status_BTN_NeedlePosition == TRIGGERED) {
-      ToogleNeedleStopPosition();
-      UpdateDisplay();
-    }
+        if (Status_BTN_NeedlePosition == TRIGGERED) {
+          ToogleNeedleStopPosition();
+          UpdateDisplayNeedlePosition();
+        }
+      }
+
+      if (StatusNeedle == OT_Triggered) {
+        // Anzahl Stiche zählen und anzeigen
+        StichCnt++;
+        UpdateDisplayStichCount(StichCnt);
+      }
+      break;
+    case ENTER_ERROR:
+      UpdateDisplayError();      
+      status = ERROR;
+      break;
+    case ERROR:
+      break;
   }
-
 
 }
 
