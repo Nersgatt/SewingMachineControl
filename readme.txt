@@ -10,6 +10,9 @@ Von mir verwendete Hardware:
 - Pulley
 - Keilriemen
 - Motorhalter Eigenbau
+- Display LCD 16x2 https://www.amazon.de/dp/B07JH6GHPR?psc=1&ref=ppx_yo2ov_dt_b_product_details
+- Sensormodule für Nadelposition TCRT500 https://www.amazon.de/dp/B07Q81NTBX?psc=1&ref=ppx_yo2ov_dt_b_product_details
+- Neue Stirnabdeckung Eigenbau aus 2mm Acryglas (Toom)
 
 Die Verdrahtung ergibt sich aus der Datei config.h
 
@@ -23,12 +26,6 @@ Anmerkungen:
   Magneten abhängt.
 - Wenn der Motor nicht anläuft, einfach mal den Magneten umdrehen. Der Wert, den der HAL-Sensor ausgibt,
   hängt von der Polung des Magneten ab.
-- Der Quellcode verwendet die Bibliothek Continous Stepper: https://github.com/bblanchon/ArduinoContinuousStepper
-
-Änderung an ArduinoContinuousStepper
-====================================
-In ContinousStepperImpl.hpp habe ich folgende function eingefügt (nach isSpinning):
-
-  bool isPowerOn() const {
-    return status_ != OFF;
-  }
+- Der Quellcode verwendet die Bibliotheken
+  - Continous Stepper: https://github.com/bblanchon/ArduinoContinuousStepper
+  - LiquidCrystal_I2C
