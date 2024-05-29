@@ -2,70 +2,104 @@
 #include <ContinuousStepper.h>
 #include <ContinuousStepper/Tickers/Tone.hpp>
 
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+
 #include <config.h>
-
-int HAL_SENSOR_STOP_VALUE = 530;
-
-int target_speed = 0;
-int last_target_speed = 0;
-boolean isPowerOff = false;
-
-ContinuousStepper<StepperDriver, ToneTicker> stepper;
-
-void setupStepper();
-void setupStopValue();
-void setupTimer1() ;
-
-void MotorOff();
-void MotorOn();
+#include <globals.h>
+#include <setup.h>
+#include <STM_NeedleStatus.h>
+#include <STM_MachineStatus.h>
+#include <STM_Buttons.h>
+#include <display.h>
+#include <stitchCount.h>
 
 void setup() {
 
+  #ifdef DEBUG_INFO
+  Serial.begin(9600);
+  #endif
 
-  cli(); // disable interrupts during setup 
-  // Serial.begin(9600);
-
-  setupTimer1();
+  setupPins();
   setupStepper();
   setupStopValue();
   MotorOff();  
-  sei(); // re-enable interrupts
+  setupTimer1();
+  setupLCD();
 
+  UpdateDisplayStichCount(0);
+  UpdateDisplayNeedlePosition();
 }
+
 
 void loop() {
-  
-  if ((target_speed == 0) and (!stepper.isSpinning())) {
-    MotorOff();
-  } else if ((target_speed > 0) and (!stepper.isSpinning())) {
-    MotorOn();
+
+  CurrentMillis = millis();
+
+  switch (status) {
+    case msSEWING:
+      // Nähen per Fußanlasser
+      STM_NeedleStatus();
+      STM_MachineStatus();
+
+      if (StatusMachine != STOP) {
+        stepper.loop();
+        UpdateStichCount();
+      } else {
+        // Maschine reagiert nur auf Buttons, wenn der Fußanlasser nicht betätigt wird
+        STM_BTN_NeedlePosition();
+        STM_BTN_MoveNeedle();
+        STM_BTN_OneStitch();
+
+        if (Status_BTN_NeedlePosition == bsTRIGGERED) {
+          ToogleNeedleStopPosition();
+          UpdateDisplayNeedlePosition();
+        }
+
+        if (Status_BTN_MoveNeedle == bsTRIGGERED) {
+          status = msHalfStitch;
+        }
+
+        if (Status_BTN_OneStitch == bsTRIGGERED) {
+          status = msOneStitch;
+        }
+      }
+      break;
+    case msHalfStitch:      
+      // Einen halben Stich ausführen
+      if (StatusHalfStitch == psPOSITIONING_STOPPED) {
+        StartHalfStitch();
+      }
+      STM_NeedleStatus();
+      STM_HalfStitch();
+      if (StatusHalfStitch == psPOSITIONING_DONE) {
+        status = msSEWING;
+      }
+      stepper.loop();
+      UpdateStichCount();
+      break;
+    case msOneStitch:      
+      // Einen ganzen Stich ausführen
+      if (StatusOneStitch == psPOSITIONING_STOPPED) {
+        StartOneStitch();
+      }
+      STM_NeedleStatus();
+      STM_OneSitch();
+      if (StatusOneStitch == psPOSITIONING_DONE) {
+        status = msSEWING;
+      }
+      stepper.loop();
+      UpdateStichCount();
+      break;
+    case msENTER_ERROR:
+      UpdateDisplayError();      
+      status = msERROR;
+      break;
+    case msERROR:
+      break;
   }
 
-  if (last_target_speed != target_speed) {
-    last_target_speed = target_speed;
-    stepper.spin(target_speed * -1);    
-  }
-
-
-  stepper.loop();
-  
 }
-
-
-void MotorOff() {
-  if (!isPowerOff) {
-    stepper.powerOff();
-    isPowerOff = true;
-  }
-}
-
-void MotorOn() {
-  if (isPowerOff) {
-    stepper.powerOn();
-    isPowerOff = false;
-  }
-}
-
 
 // Timer 1 interrupt service routine (ISR)
 // Wertet die Positon des Fußpedals aus
@@ -76,39 +110,10 @@ ISR(TIMER1_COMPA_vect)
   if (val < HAL_SENSOR_STOP_VALUE) {
     target_speed = 0;
   } else if (val > HAL_SENSOR_FULL_THROTTLE_VALUE) {
-    target_speed = max_speed;    
+    target_speed = MAX_SPEED;    
   } else {
-    target_speed = map(val, HAL_SENSOR_FULL_THROTTLE_VALUE, HAL_SENSOR_STOP_VALUE, max_speed, 0);
+    target_speed = map(val, HAL_SENSOR_FULL_THROTTLE_VALUE, HAL_SENSOR_STOP_VALUE, MAX_SPEED, 0);
   }
   
 }
 
-void setupStopValue() {  
-  int val = analogRead(PIN_POT);
-  HAL_SENSOR_STOP_VALUE = val + 10;
-}
-
-void setupStepper() {
-  stepper.begin(PIN_PUL, PIN_DIR);
-  stepper.setAcceleration(acceleration);
-  stepper.setEnablePin(PIN_ENA);
-  MotorOff();
-}
-
-void setupTimer1() {
-  noInterrupts();
-  // Clear registers
-  TCCR1A = 0;
-  TCCR1B = 0;
-  TCNT1 = 0;
-
-  // 4 Hz (16000000/((15624+1)*256))
-  OCR1A = 15624;
-  // CTC
-  TCCR1B |= (1 << WGM12);
-  // Prescaler 256
-  TCCR1B |= (1 << CS12);
-  // Output Compare Match A Interrupt Enable
-  TIMSK1 |= (1 << OCIE1A);
-  interrupts();
-}
