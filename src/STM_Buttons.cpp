@@ -35,7 +35,7 @@ void STM_BTN_NeedlePosition() {
     case ARMED: //ARMED
       //Check to see if the proper has delay has passed.  If a bounce occures then RESET
       t_s1 = CurrentMillis;
-      if (t_s1 - t_0_s1 > BOUNCE_DELAY) {Status_BTN_NeedlePosition = DRAWN;}
+      if (t_s1 - t_0_s1 > BUTTON_BOUNCE_DELAY) {Status_BTN_NeedlePosition = DRAWN;}
       if (val_s1 == HIGH) {Status_BTN_NeedlePosition = RESET;}
     break;
 
@@ -43,7 +43,7 @@ void STM_BTN_NeedlePosition() {
       //If switch goes HIGH, then TRIGGER. Also check timer for a "Long Pess"
       t_s1 = CurrentMillis;
       if (val_s1 == HIGH) {Status_BTN_NeedlePosition = TRIGGERED;}
-      if (t_s1 - t_0_s1 > HOLD_DELAY) {Status_BTN_NeedlePosition = HOLD;}
+      if (t_s1 - t_0_s1 > BUTTON_HOLD_DELAY) {Status_BTN_NeedlePosition = HOLD;}
     break;
 
     case TRIGGERED: //TRIGGERED!
@@ -91,7 +91,7 @@ void STM_BTN_MoveNeedle() {
     case ARMED: //ARMED
       //Check to see if the proper has delay has passed.  If a bounce occures then RESET
       t_s1 = CurrentMillis;
-      if (t_s1 - t_0_s1 > BOUNCE_DELAY) {Status_BTN_MoveNeedle = DRAWN;}
+      if (t_s1 - t_0_s1 > BUTTON_BOUNCE_DELAY) {Status_BTN_MoveNeedle = DRAWN;}
       if (val_s1 == HIGH) {Status_BTN_MoveNeedle = RESET;}
     break;
 
@@ -99,7 +99,7 @@ void STM_BTN_MoveNeedle() {
       //If switch goes HIGH, then TRIGGER. Also check timer for a "Long Pess"
       t_s1 = CurrentMillis;
       if (val_s1 == HIGH) {Status_BTN_MoveNeedle = TRIGGERED;}
-      if (t_s1 - t_0_s1 > HOLD_DELAY) {Status_BTN_MoveNeedle = HOLD;}
+      if (t_s1 - t_0_s1 > BUTTON_HOLD_DELAY) {Status_BTN_MoveNeedle = HOLD;}
     break;
 
     case TRIGGERED: //TRIGGERED!
@@ -147,7 +147,7 @@ void STM_BTN_OneStitch() {
     case ARMED: //ARMED
       //Check to see if the proper has delay has passed.  If a bounce occures then RESET
       t_s1 = CurrentMillis;
-      if (t_s1 - t_0_s1 > BOUNCE_DELAY) {Status_BTN_OneStitch = DRAWN;}
+      if (t_s1 - t_0_s1 > BUTTON_BOUNCE_DELAY) {Status_BTN_OneStitch = DRAWN;}
       if (val_s1 == HIGH) {Status_BTN_OneStitch = RESET;}
     break;
 
@@ -155,7 +155,7 @@ void STM_BTN_OneStitch() {
       //If switch goes HIGH, then TRIGGER. Also check timer for a "Long Pess"
       t_s1 = CurrentMillis;
       if (val_s1 == HIGH) {Status_BTN_OneStitch = TRIGGERED;}
-      if (t_s1 - t_0_s1 > HOLD_DELAY) {Status_BTN_OneStitch = HOLD;}
+      if (t_s1 - t_0_s1 > BUTTON_HOLD_DELAY) {Status_BTN_OneStitch = HOLD;}
     break;
 
     case TRIGGERED: //TRIGGERED!

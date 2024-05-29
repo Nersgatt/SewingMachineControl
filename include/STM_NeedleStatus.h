@@ -1,9 +1,12 @@
 #include <Arduino.h>
 
-enum NeedleStatus {UNKNOWN_Triggered, UNKNOWN_Hold, OT_Triggered, OT_Hold, UT_Triggered, UT_Hold};
+enum NeedleStatus {
+        nsUNKNOWN_Armed, nsUNKNOWN_WAIT, nsUNKNOWN_Triggered, nsUNKNOWN_Hold, 
+        nsOT_Armed, nsOT_WAIT, nsOT_Triggered, nsOT_Hold, 
+        nsUT_Armed, nsUT_WAIT, nsUT_Triggered, nsUT_Hold};
 enum NeedlePosition {npOT, npUT};
 
-extern const String NeedleStatusText[6];
+extern const String NeedleStatusText[];
 extern NeedleStatus StatusNeedle;
 extern NeedlePosition LastNeedlePostion;
 

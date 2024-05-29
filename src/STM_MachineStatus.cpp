@@ -86,7 +86,7 @@ void STM_MachineStatus() {
 
 void STM_Positioning() {
 
-  static NeedleStatus TargetStatus = OT_Triggered;
+  static NeedleStatus TargetStatus = nsOT_Triggered;
   static long t_PosStart = 0;
 
   switch (StatusPositioning)
@@ -96,9 +96,9 @@ void STM_Positioning() {
   case psPOSITIONING_START:
     t_PosStart = CurrentMillis;
     if (LastNeedlePostion == npOT) {
-      TargetStatus = UT_Triggered;
+      TargetStatus = nsUT_Triggered;
     } else {
-      TargetStatus = OT_Triggered;
+      TargetStatus = nsOT_Triggered;
     }
 
     stepper.spin(POSITIONING_SPEED * -1);
@@ -155,7 +155,7 @@ void STM_OneSitch() {
       status = msENTER_ERROR;
     } else {
 
-      if (StatusNeedle == UT_Triggered) {
+      if (StatusNeedle == nsUT_Triggered) {
         stepper.spin(0); 
         MotorOff();
         StatusOneStitch = psPOSITIONING_DONE;

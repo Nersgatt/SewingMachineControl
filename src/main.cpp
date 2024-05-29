@@ -13,6 +13,15 @@
 #include <STM_Buttons.h>
 #include <display.h>
 
+void UpdateStichCount() {
+  static unsigned long StichCnt = 0;
+  if (StatusNeedle == nsOT_Triggered) {
+    // Anzahl Stiche zählen und anzeigen
+    StichCnt++;
+    UpdateDisplayStichCount(StichCnt);
+  }
+}
+
 void setup() {
 
   #ifdef DEBUG_INFO
@@ -33,9 +42,6 @@ void setup() {
 
 void loop() {
 
-  // static int lastStatus = 0;
-  static unsigned long StichCnt = 0;
-
   CurrentMillis = millis();
 
   switch (status) {
@@ -45,6 +51,7 @@ void loop() {
 
       if (StatusMachine != STOP) {
         stepper.loop();
+        UpdateStichCount();
       } else {
         // Maschine reagiert nur auf Buttons, wenn der Fußanlasser nicht betätigt wird
         STM_BTN_NeedlePosition();
@@ -64,12 +71,6 @@ void loop() {
           status = msOneStitch;
         }
       }
-
-      if (StatusNeedle == OT_Triggered) {
-        // Anzahl Stiche zählen und anzeigen
-        StichCnt++;
-        UpdateDisplayStichCount(StichCnt);
-      }
       break;
     case msPOSITIONING:      
       if (StatusPositioning == psPOSITIONING_STOPPED) {
@@ -81,6 +82,7 @@ void loop() {
         status = msSEWING;
       }
       stepper.loop();
+      UpdateStichCount();
       break;
     case msOneStitch:      
       if (StatusOneStitch == psPOSITIONING_STOPPED) {
@@ -94,6 +96,7 @@ void loop() {
         status = msSEWING;
       }
       stepper.loop();
+      UpdateStichCount();
       break;
     case msENTER_ERROR:
       UpdateDisplayError();      
@@ -103,7 +106,10 @@ void loop() {
       break;
   }
 
+
+
 }
+
 
 // Timer 1 interrupt service routine (ISR)
 // Wertet die Positon des Fußpedals aus
