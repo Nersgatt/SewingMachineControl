@@ -19,8 +19,9 @@
 #define HAL_SENSOR_FULL_THROTTLE_VALUE 860 // Vollgas-Wert des HAL-Sensors
 
 #define NEEDLE_SENSOR_BOUNCE_DELAY 5    // DELAY für das Debouncing der Nadelsensoren
-#define NEELDE_OT_HOLD_DELAY 150        // So lange muss die Nadel in der oberen Position sein, damit das als OT_HOLD erkannt wird. Damit wird sicher gestellt,
-                                        // dass der Fadenheber in OT_HOLD in der oberen Position ist.
+#define NEELDE_OT_HOLD_DELAY 200        // So lange muss die Nadel in der oberen Position sein, damit das als OT_HOLD erkannt wird. Damit wird sicher gestellt,
+                                        // dass der Fadenheber in OT_HOLD in der oberen Position ist. Wird POSITIONING_SPEED angepasst, muss auch auch 
+                                        // NEEDLE_OT_HOLD_DELAY angepasst werden und anders rum
 #define BUTTON_BOUNCE_DELAY 50          // DELAY für das Debouncing der Buttons
 #define BUTTON_HOLD_DELAY 1000          // DELAY, nach dem der Button in den Status "HOLD" geht, um einen langen Buttonpress zu erkennen
 
