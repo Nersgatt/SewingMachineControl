@@ -2,7 +2,7 @@
 
 enum NeedleStatus {
         nsUNKNOWN_Armed, nsUNKNOWN_WAIT, nsUNKNOWN_Triggered, nsUNKNOWN_Hold, 
-        nsOT_Armed, nsOT_WAIT, nsOT_Triggered, nsOT_Hold, 
+        nsOT_Armed, nsOT_WAIT, nsOT_Triggered, nsOT_HOLD_Armed, nsOT_HOLD_Wait, nsOT_Hold, 
         nsUT_Armed, nsUT_WAIT, nsUT_Triggered, nsUT_Hold};
 enum NeedlePosition {npOT, npUT};
 

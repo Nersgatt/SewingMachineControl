@@ -82,13 +82,22 @@ void STM_NeedleStatus() {
     case nsOT_Triggered:
       LastNeedlePostion = npOT;
       if (SensorOT) {
-        StatusNeedle = nsOT_Hold;
+        StatusNeedle = nsOT_HOLD_Armed;
       } else if (SensorUT) {
         StatusNeedle = nsUT_Armed;
       } else {
         StatusNeedle = nsUNKNOWN_Armed;
       }
 
+      break;
+    case nsOT_HOLD_Armed:
+      t0 = CurrentMillis;
+      StatusNeedle = nsOT_HOLD_Wait;
+      break;
+    case nsOT_HOLD_Wait:
+      if (CurrentMillis - t0 > NEELDE_OT_HOLD_DELAY) {
+        StatusNeedle = nsOT_Hold;
+      }
       break;
     case nsOT_Hold:
       
@@ -143,7 +152,8 @@ void STM_NeedleStatus() {
 
 bool IsNeedleUp() {
   // return StatusNeedle == nsOT_Triggered || StatusNeedle == nsOT_Hold;
-  return LastNeedlePostion == npOT && StatusNeedle == nsUNKNOWN_Triggered;
+  return StatusNeedle == nsOT_Hold;
+  // return LastNeedlePostion == npOT && StatusNeedle == nsUNKNOWN_Triggered;
 };
 
 bool IsNeedleDown() {

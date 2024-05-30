@@ -134,14 +134,18 @@ void STM_OneSitch() {
 
   static NeedleStatus TargetStatus = nsOT_Triggered;
   static long t_PosStart = 0;
+  static NeedlePosition _np;
+  static bool OneStitchDone;
 
   switch (StatusOneStitch)
   {
   case psPOSITIONING_STOPPED:
     break;
   case psPOSITIONING_START:
+    _np = LastNeedlePostion;
+    OneStitchDone = false;
     t_PosStart = CurrentMillis;
-    if (LastNeedlePostion == npOT) {
+    if (_np == npOT) {
       TargetStatus = nsOT_Triggered;
     } else {
       TargetStatus = nsUT_Triggered;
@@ -153,6 +157,8 @@ void STM_OneSitch() {
     break;
 
   case psPOSITIONING_RUNNING:
+    if (LastNeedlePostion != _np) {OneStitchDone = true;}
+
     if (CurrentMillis - t_PosStart > (MAX_POSITIONING_DELAY * 2)) {
       // Die Positionierung dauert zu lange. In den Fehlerzustand gehen
       stepper.spin(0);
@@ -162,11 +168,13 @@ void STM_OneSitch() {
       status = msENTER_ERROR;
     } else {
 
-      if ((TargetStatus == nsOT_Triggered && IsNeedleUp()) ||
-          (TargetStatus == nsUT_Triggered && StatusNeedle == nsUT_Triggered)) {
-        stepper.spin(0); 
-        MotorOff();
-        StatusOneStitch = psPOSITIONING_DONE;
+      if (OneStitchDone) {
+        if ((TargetStatus == nsOT_Triggered && IsNeedleUp()) ||
+            (TargetStatus == nsUT_Triggered && StatusNeedle == nsUT_Triggered)) {
+          stepper.spin(0); 
+          MotorOff();
+          StatusOneStitch = psPOSITIONING_DONE;
+        }
       }
     }
     break;
