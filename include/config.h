@@ -18,7 +18,7 @@
 #define ACC 30000                          // Beschleunigung
 #define HAL_SENSOR_FULL_THROTTLE_VALUE 860 // Vollgas-Wert des HAL-Sensors
 
-#define NEEDLE_SENSOR_BOUNCE_DELAY 50   // DELAY für das Debouncing der Nadelsensoren
+#define NEEDLE_SENSOR_BOUNCE_DELAY 5   // DELAY für das Debouncing der Nadelsensoren
 #define BUTTON_BOUNCE_DELAY 50          // DELAY für das Debouncing der Buttons
 #define BUTTON_HOLD_DELAY 1000          // DELAY, nach dem der Button in den Status "HOLD" geht, um einen langen Buttonpress zu erkennen
 
