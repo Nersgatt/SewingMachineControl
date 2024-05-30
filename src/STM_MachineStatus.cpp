@@ -116,7 +116,7 @@ void STM_HalfStitch() {
       status = msENTER_ERROR;
     } else {
 
-      if ((TargetStatus == nsOT_Triggered && LastNeedlePostion == npOT && StatusNeedle == nsUNKNOWN_Triggered) ||
+      if ((TargetStatus == nsOT_Triggered && IsNeedleUp()) ||
           (TargetStatus == nsUT_Triggered && StatusNeedle == nsUT_Triggered)) {
         stepper.spin(0); 
         MotorOff();
@@ -162,7 +162,7 @@ void STM_OneSitch() {
       status = msENTER_ERROR;
     } else {
 
-      if ((TargetStatus == nsOT_Triggered && LastNeedlePostion == npOT && StatusNeedle == nsUNKNOWN_Triggered) ||
+      if ((TargetStatus == nsOT_Triggered && IsNeedleUp()) ||
           (TargetStatus == nsUT_Triggered && StatusNeedle == nsUT_Triggered)) {
         stepper.spin(0); 
         MotorOff();

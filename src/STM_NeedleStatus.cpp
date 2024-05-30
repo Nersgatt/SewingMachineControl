@@ -142,7 +142,8 @@ void STM_NeedleStatus() {
 }
 
 bool IsNeedleUp() {
-  return StatusNeedle == nsOT_Triggered || StatusNeedle == nsOT_Hold;
+  // return StatusNeedle == nsOT_Triggered || StatusNeedle == nsOT_Hold;
+  return LastNeedlePostion == npOT && StatusNeedle == nsUNKNOWN_Triggered;
 };
 
 bool IsNeedleDown() {
