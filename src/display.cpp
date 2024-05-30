@@ -45,13 +45,13 @@ void UpdateDisplayNeedlePosition() {
     lcd.setCursor(7, 1);
     switch (NeedleStopPostion)
     {
-    case UP:
+    case nspUP:
         lcd.write(0);
         break;
-    case DOWN:
+    case nspDOWN:
         lcd.write(1);
         break;
-    case DontCare:
+    case nspDontCare:
         lcd.write(2);
         break;
     }

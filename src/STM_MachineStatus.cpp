@@ -6,8 +6,8 @@
 
 const String MachineStatusText[] = {"STOP", "STARTING", "RUNNING", "STOPPING"};
 const String NeedleStopPositionsText[] = {"Oben", "Unten", "Egal"};
-MachineStatus StatusMachine = STOP;
-NeedleStopPositions NeedleStopPostion = DontCare;
+MachineStatus StatusMachine = msSTOP;
+NeedleStopPositions NeedleStopPostion = nspDontCare;
 PositioningStatus StatusHalfStitch = psPOSITIONING_STOPPED;
 PositioningStatus StatusOneStitch = psPOSITIONING_STOPPED;
 
@@ -18,64 +18,69 @@ void STM_MachineStatus() {
 
   switch (StatusMachine)
   {
-  case STOP:
+  case msSTOP:
     if (target_speed > 0) {
-      StatusMachine = STARTING;
+      StatusMachine = msSTARTING;
     }
     break;
 
-  case STARTING:
+  case msSTARTING:
     MotorOn();
-    StatusMachine = RUNNING;
+    StatusMachine = msRUNNING;
     break;
 
-  case RUNNING:    
+  case msRUNNING:    
     if (last_target_speed != target_speed) {
       last_target_speed = target_speed;
       stepper.spin(target_speed * -1);    
     }
 
     if (target_speed == 0) {
-      StatusMachine = STOPPING;
+      StatusMachine = msSTOPPING;
     }
     break;
 
-  case STOPPING:
+  case msSTOPPING:
     if (target_speed > 0) {
-      StatusMachine = RUNNING;
+      StatusMachine = msRUNNING;
     } else {
       if ((stepper.speed() * -1) <= POSITIONING_SPEED) {
-        StatusMachine = STARTPOSITIONING;
+        StatusMachine = msSTARTPOSITIONING;
       }
     }    
     break;
-  case STARTPOSITIONING:
+  case msSTARTPOSITIONING:
     t_PosStart = CurrentMillis;
-    StatusMachine = POSITIONING;
+    StatusMachine = msPOSITIONING;
     break;
-  case POSITIONING:
+  case msPOSITIONING:
     if (target_speed > 0) {
-      StatusMachine = RUNNING;
+      StatusMachine = msRUNNING;
     } else {
 
-      if (CurrentMillis - t_PosStart > MAX_POSITIONING_DELAY) {
+      if (NeedleStopPostion == nspDontCare) {
+        // keine Positionierung gewünscht, Motor sofort anhalten
+          stepper.spin(0);
+          MotorOff();
+          StatusMachine = msSTOP;
+      } else if (CurrentMillis - t_PosStart > MAX_POSITIONING_DELAY) {
         // Die Positionierung dauert zu lange. In den Fehlerzustand gehen
         stepper.spin(0);
         MotorOff();
-        StatusMachine = STOP;
+        StatusMachine = msSTOP;
         ErrorText = "Positionierung?!";
         status = msENTER_ERROR;
       } else {
 
-        if (((NeedleStopPostion == DOWN) && !IsNeedleDown()) ||
-            ((NeedleStopPostion == UP) && !IsNeedleUp())) {
+        if (((NeedleStopPostion == nspDOWN) && !IsNeedleDown()) ||
+            ((NeedleStopPostion == nspUP) && !IsNeedleUp())) {
           // Geschwindigkeit halten, bis gewünschte Position gerreicht ist
           stepper.spin(POSITIONING_SPEED * -1); 
         } else {
           // Endposition erreicht
           stepper.spin(0);
           MotorOff();
-          StatusMachine = STOP;
+          StatusMachine = msSTOP;
         }
       }
     }
@@ -206,14 +211,14 @@ void MotorOn() {
 
 void ToogleNeedleStopPosition() {
   switch (NeedleStopPostion) {
-    case UP:
-      NeedleStopPostion = DOWN;
+    case nspUP:
+      NeedleStopPostion = nspDOWN;
       break;
-    case DOWN:
-      NeedleStopPostion = DontCare;
+    case nspDOWN:
+      NeedleStopPostion = nspDontCare;
       break;
-    case DontCare:
-      NeedleStopPostion = UP;
+    case nspDontCare:
+      NeedleStopPostion = nspUP;
       break;
   }
 }

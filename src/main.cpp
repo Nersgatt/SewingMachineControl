@@ -42,7 +42,7 @@ void loop() {
       STM_NeedleStatus();
       STM_MachineStatus();
 
-      if (StatusMachine != STOP) {
+      if (StatusMachine != msSTOP) {
         stepper.loop();
         UpdateStichCount();
       } else {

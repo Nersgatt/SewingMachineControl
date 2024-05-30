@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
-enum MachineStatus {STOP, STARTING, RUNNING, STOPPING, STARTPOSITIONING, POSITIONING};
-enum NeedleStopPositions {UP, DOWN, DontCare};
+enum MachineStatus {msSTOP, msSTARTING, msRUNNING, msSTOPPING, msSTARTPOSITIONING, msPOSITIONING};
+enum NeedleStopPositions {nspUP, nspDOWN, nspDontCare};
 enum PositioningStatus {psPOSITIONING_STOPPED, psPOSITIONING_START, psPOSITIONING_RUNNING, psPOSITIONING_DONE};
 
 extern const String MachineStatusText[];
