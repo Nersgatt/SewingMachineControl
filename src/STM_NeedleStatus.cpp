@@ -5,16 +5,28 @@
 
 const String NeedleStatusText[] = {
     "UNKNOWN_Armed", "UNKNOWN_Wait", "UNKNOWN triggered", "Unknown hold", 
-    "OT_Armed", "OT_Wait", "OT triggered", "OT hold", 
+    "OT_Armed", "OT_Wait", "OT triggered", "OT_HOLD_Armed", "OT_HOLD_Wait", "OT hold", 
     "UT_Armed", "UT_Wait", "UT triggered", "UT hold"};
+
+const String LastNeedlePosText[] {
+  "OT", "UT"
+};
+
 NeedleStatus StatusNeedle = nsUNKNOWN_Hold;
+#ifdef DEBUG_INFO
+  NeedleStatus OldStatusNeedle;
+#endif
 NeedlePosition LastNeedlePostion = npOT;
 
 void STM_NeedleStatus() {
   static long t0 = 0;
 
-  bool SensorOT = (digitalRead(PIN_OT) == LOW);
-  bool SensorUT = (digitalRead(PIN_UT) == LOW);
+  #ifdef DEBUG_INFO
+  OldStatusNeedle = StatusNeedle;
+  #endif
+
+  bool SensorOT = (digitalRead(PIN_OT) == HIGH);
+  bool SensorUT = (digitalRead(PIN_UT) == HIGH);
 
   switch (StatusNeedle) {
     case nsUNKNOWN_Armed:
@@ -22,6 +34,7 @@ void STM_NeedleStatus() {
         StatusNeedle = nsOT_Armed;
       } else if (SensorUT) {
         StatusNeedle = nsUT_Armed;
+
       } else {
         t0 = CurrentMillis;
         StatusNeedle = nsUNKNOWN_WAIT;
@@ -32,6 +45,7 @@ void STM_NeedleStatus() {
         StatusNeedle = nsOT_Armed;
       } else if (SensorUT) {
         StatusNeedle = nsUT_Armed;
+
       } else {
         if (CurrentMillis - t0 > NEEDLE_SENSOR_BOUNCE_DELAY) {
           StatusNeedle = nsUNKNOWN_Triggered;
@@ -100,7 +114,6 @@ void STM_NeedleStatus() {
       }
       break;
     case nsOT_Hold:
-      
       if (SensorUT) {
         StatusNeedle = nsUT_Armed;
       } else if (!SensorOT) {
@@ -147,6 +160,25 @@ void STM_NeedleStatus() {
       }
       break;
   }
+
+  #ifdef DEBUG_INFO
+  if (OldStatusNeedle != StatusNeedle) {
+    Serial.print("Needle Status changed, Old: ");
+    Serial.print(NeedleStatusText[OldStatusNeedle]);
+    Serial.print(", New ");
+    Serial.println(NeedleStatusText[StatusNeedle]);
+
+    Serial.print("SensorOT: ");
+    Serial.print(SensorOT);
+
+    Serial.print(" SensorUT: ");
+    Serial.println(SensorUT);
+
+    Serial.print("LastNeedlePos: ");
+    Serial.println(LastNeedlePosText[LastNeedlePostion]);
+  }
+  #endif
+  
 
 }
 

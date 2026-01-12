@@ -98,11 +98,17 @@ void STM_HalfStitch() {
   {
   case psPOSITIONING_STOPPED:
     break;
-  case psPOSITIONING_START:
+  case psPOSITIONING_START:    
     t_PosStart = CurrentMillis;
     if (LastNeedlePostion == npOT) {
+      #ifdef DEBUG_INFO
+      Serial.println("Start positioning, target UT");
+      #endif
       TargetStatus = nsUT_Triggered;
     } else {
+      #ifdef DEBUG_INFO
+      Serial.println("Start positioning, target OT");
+      #endif
       TargetStatus = nsOT_Triggered;
     }
 
