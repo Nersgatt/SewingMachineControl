@@ -1,4 +1,4 @@
-(c) 2024 - Jens Tönsing
+(c) 2024 - 2026 - Jens Tönsing
 Kontakt: jens@jens-toensing.de
 
 Von mir verwendete Hardware:
@@ -11,7 +11,7 @@ Von mir verwendete Hardware:
 - Keilriemen
 - Motorhalter Eigenbau
 - Display LCD 16x2 https://www.amazon.de/dp/B07JH6GHPR?psc=1&ref=ppx_yo2ov_dt_b_product_details
-- Sensormodule für Nadelposition TCRT500 https://www.amazon.de/dp/B07Q81NTBX?psc=1&ref=ppx_yo2ov_dt_b_product_details
+- Sensormodule für Nadelposition KY-024 (selbe wie beim Pedal) https://de.aliexpress.com/item/1005005327140435.html
 - Neue Stirnabdeckung Eigenbau aus 2mm Acryglas (Toom)
 
 Die Verdrahtung ergibt sich aus der Datei config.h
